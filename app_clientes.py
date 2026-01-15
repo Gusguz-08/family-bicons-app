@@ -9,7 +9,7 @@ from datetime import datetime
 st.set_page_config(page_title="Family Bicons - Socios", page_icon="🌱", layout="centered")
 
 # 👇👇 TU ENLACE DE BASE DE DATOS (Mismo de siempre) 👇👇
-DB_URL = "postgresql://postgres.osadlrveedbzfuoctwvz:Balla0605332550@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+DB_URL = "postgresql://postgres.osadlrveedbzfuoctwvz:Balla0605332550@aws-1-us-east-1.pooler.supabase.com:6543/postgres"
 
 def get_connection():
     try:
@@ -138,4 +138,5 @@ else:
     st.divider()
     if st.button("Cerrar Sesión"):
         st.session_state.usuario = None
+
         st.rerun()
