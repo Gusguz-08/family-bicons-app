@@ -182,7 +182,7 @@ if st.session_state.usuario is None:
     with col1:
         st.write("") 
         try:
-            st.image("WhatsApp Image 2026-01-20 at 20.45.54.jpeg", width=140)
+            st.image("logo.png", width=140)
         except:
             st.header("🌱 Family Bicons")
 
@@ -333,3 +333,4 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
+
