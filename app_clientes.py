@@ -239,23 +239,25 @@ if st.session_state.usuario is None:
             st.markdown("</div>", unsafe_allow_html=True)
 
         # --- VISTA 2: RECUPERACIÓN DE CONTRASEÑA ---
-        elif st.session_state.vista_login == 'recuperar':
+            elif st.session_state.vista_login == 'recuperar':
             st.markdown("""
             <div class="recovery-card">
-                <h3 style="color:#004d00 !important; text-align:center;">Recuperar Acceso</h3>
-                <p style="font-size:13px; text-align:center; color:#333 !important;">
-                    Por seguridad, contacta al administrador.
+                <h3 style="color:#004d00; text-align:center;">Recuperar Acceso</h3>
+                <p style="font-size:13px; text-align:center; color:#666;">
+                    Por seguridad, el restablecimiento de contraseña debe ser realizado por un administrador.
                 </p>
-                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0; border: 1px solid #ddd;">
-                    <small style="font-weight:bold; color:#000 !important;">📞 Contacto Soporte:</small><br>
-                    <span style="color:#004d00; font-weight:bold;">+593 99 999 9999</span>
+                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
+                    <small style="font-weight:bold; color:#333;">📞 Contacto Soporte:</small><br>
+                    <span style="color:#004d00;">+593 99 999 9999</span>
                 </div>
+                <p style="font-size:12px; color:#888;">Envía tu número de cédula y usuario para validar tu identidad.</p>
             </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<div style='margin-top:10px;'>", unsafe_allow_html=True)
+            # Botón Volver con estilo secundario
+            st.markdown("<div class='btn-secondary'>", unsafe_allow_html=True)
             if st.button("⬅ Volver al Login"):
-                st.session_state.vista_login = 'login'
+                st.session_state.vista_login = 'login' # Regresamos
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -339,3 +341,4 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
+
