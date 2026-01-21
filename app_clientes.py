@@ -8,8 +8,12 @@ from datetime import datetime
 # ==========================================
 st.set_page_config(page_title="Family Bicons - Socios", page_icon="🌱", layout="centered")
 
-# 👇👇 TU ENLACE SEGURO (Ya configurado) 👇👇
-DB_URL = st.secrets["DB_URL"]
+# 👇👇 TU ENLACE SEGURO (Ya configurado con Secrets) 👇👇
+try:
+    DB_URL = st.secrets["DB_URL"]
+except:
+    st.error("⚠️ Error: No se encontró el secreto DB_URL. Revisa la configuración en Streamlit Cloud.")
+    st.stop()
 
 # CSS Estilizado
 st.markdown("""
@@ -41,7 +45,6 @@ def validar_login(usuario, password):
     conn = get_connection()
     if not conn: return False
     try:
-        # Usamos parameters para evitar SQL Injection
         df = pd.read_sql("SELECT * FROM usuarios WHERE usuario = %s AND password = %s", conn, params=(usuario, password))
         return not df.empty
     except:
@@ -72,7 +75,6 @@ def solicitar_prestamo(usuario, monto, motivo):
     if not conn: return False
     try:
         cur = conn.cursor()
-        # Asegúrate de tener la tabla 'solicitudes' creada en Supabase
         cur.execute("INSERT INTO solicitudes (usuario, monto, motivo, fecha, estado) VALUES (%s, %s, %s, %s, 'Pendiente')", 
                     (usuario, monto, motivo, datetime.now()))
         conn.commit()
@@ -110,14 +112,14 @@ else:
     
     st.write(f"Hola, **{user}** 👋")
     
-    # 4 PESTAÑAS AHORA
+    # DEFINICIÓN DE PESTAÑAS
     tab1, tab2, tab3, tab4 = st.tabs(["💎 ACCIONES", "📅 PAGOS", "💸 SOLICITAR", "⚙️ PERFIL"])
     
     # ---------------- TAB 1: ACCIONES ----------------
     with tab1:
+        # ATENCIÓN: Todo esto debe tener sangría (espacio a la izquierda)
         if not inv.empty:
             valores_texto = inv.iloc[0]['valores_meses']
-            # Manejo de error si la cadena está vacía
             if valores_texto:
                 valores = [float(x) for x in valores_texto.split(",")]
                 total_acciones = sum(valores)
@@ -136,11 +138,68 @@ else:
                 df_chart = pd.DataFrame({"Mes": ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][:len(valores)], "Acciones": valores})
                 st.area_chart(df_chart.set_index("Mes"), color="#2e7d32")
             else:
-                st.warning("Datos de acciones incompletos.")
+                st.warning("Datos incompletos.")
         else:
             st.info("No tienes inversiones activas.")
 
     # ---------------- TAB 2: DEUDAS ----------------
     with tab2:
         if not deu.empty:
-            st
+            st.subheader("⚠️ Próximos Pagos")
+            for index, row in deu.iterrows():
+                monto_total = row['monto']
+                plazo = row['plazo']
+                cuota = monto_total / plazo if plazo > 0 else monto_total
+                
+                st.markdown(f"""
+                <div class="card-debt">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="font-weight:bold; color:#888;">PRÉSTAMO ({row['mes']})</span>
+                        <span style="background:#ffebee; color:#c53030; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:bold;">PENDIENTE</span>
+                    </div>
+                    <div style="margin-top:10px; font-size:12px;">Cuota mensual:</div>
+                    <div class="debt-money">${cuota:,.2f}</div>
+                    <div style="margin-top:5px; font-size:12px; color:#666;">
+                        Total: ${monto_total:,.2f} • Plazo: {plazo} m
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.success("✅ ¡Estás al día! No tienes deudas.")
+
+    # ---------------- TAB 3: SOLICITAR (Aquí estaba el error probable) ----------------
+    with tab3:
+        st.subheader("Solicitar Nuevo Crédito")
+        st.info("Formulario de solicitud.")
+        
+        with st.form("frm_solicitud"):
+            monto_req = st.number_input("Monto a solicitar ($)", min_value=10.0, step=5.0)
+            motivo_req = st.text_area("Motivo del préstamo", placeholder="Ej: Compra de materiales...")
+            btn_sol = st.form_submit_button("Enviar Solicitud")
+            
+            if btn_sol:
+                if solicitar_prestamo(user, monto_req, motivo_req):
+                    st.toast("✅ ¡Solicitud enviada!", icon="🎉")
+                else:
+                    st.error("Error al enviar.")
+
+    # ---------------- TAB 4: PERFIL ----------------
+    with tab4:
+        st.subheader("Mi Cuenta")
+        
+        with st.expander("🔐 Cambiar Contraseña"):
+            p1 = st.text_input("Nueva contraseña", type="password", key="p1")
+            p2 = st.text_input("Confirmar contraseña", type="password", key="p2")
+            if st.button("Actualizar Clave"):
+                if p1 == p2 and len(p1) > 0:
+                    if cambiar_password(user, p1):
+                        st.success("Contraseña cambiada. Reingresa.")
+                        st.session_state.usuario = None
+                        st.rerun()
+                else:
+                    st.warning("Las contraseñas no coinciden.")
+
+        st.divider()
+        if st.button("Cerrar Sesión"):
+            st.session_state.usuario = None
+            st.rerun()
