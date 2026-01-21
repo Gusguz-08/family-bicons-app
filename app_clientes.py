@@ -234,10 +234,7 @@ if st.session_state.usuario is None:
 
         # Footer fuera de la tarjeta
         st.markdown("""
-        <div style="margin-top: 20px; display: flex; justify-content: space-between; padding: 0 10px;">
-             <div style="cursor: pointer; opacity: 0.8; color: #004d00;"><small>🔒 ¿Bloqueada?</small></div>
-             <div style="cursor: pointer; opacity: 0.8; color: #004d00;"><small>👤 Regístrate</small></div>
-        </div>
+
         <div style="text-align: center; margin-top: 30px;">
              <small style="font-size: 11px; color: #999;">© 2026 Family Bicons. Todos los derechos reservados.</small>
         </div>
@@ -344,3 +341,4 @@ else:
         if st.button("Cerrar Sesión"):
             st.session_state.usuario = None
             st.rerun()
+
