@@ -17,23 +17,21 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (CORRIGIENDO EL CUADRO VACÍO)
+# 🎨 ESTILOS CSS (V6.0 - BOTÓN VERDE Y ARREGLOS FINALES)
 # ==========================================
 st.markdown("""
     <style>
     /* 1. Fondo General y Centrado */
     .stApp {
-        background-color: #f0f2f5; /* Gris muy suave */
+        background-color: #f0f2f5;
         font-family: 'Segoe UI', sans-serif;
     }
-    
-    /* Esto centra el contenido verticalmente para que no se vea vacío */
     [data-testid="stAppViewContainer"] > .main {
         justify-content: center;
         padding-top: 5vh; 
     }
 
-    /* 2. LOGO REDONDO (Mantiene tu logo limpio) */
+    /* 2. LOGO REDONDO */
     [data-testid="stImage"] img {
         border-radius: 50%;
         border: 5px solid white;
@@ -41,13 +39,12 @@ st.markdown("""
         background-color: white;
     }
 
-    /* 3. LA TARJETA MÁGICA (Estilizamos el FORMULARIO directamente) */
-    /* Eliminamos el cuadro vacío estilizandolo directo al contenedor del form */
+    /* 3. LA TARJETA (Estilo al Formulario) */
     [data-testid="stForm"] {
         background-color: white;
         padding: 40px;
         border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08); /* Sombra elegante */
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         border: 1px solid #e1e4e8;
     }
 
@@ -55,43 +52,64 @@ st.markdown("""
     .stTextInput input {
         border: 1px solid #ccc;
         border-radius: 6px;
-        padding: 10px;
+        padding: 10px 12px;
         background-color: #fff;
         color: #333;
+        font-size: 16px;
     }
     .stTextInput input:focus {
-        border-color: #ffdd00;
-        box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.3);
+        border-color: #004d00; /* Borde verde al enfocar */
+        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
     }
 
-    /* 5. EL BOTÓN AMARILLO (FORZADO CON ALTA PRIORIDAD) */
-    /* Usamos selectores especificos para asegurar que se ponga amarillo */
-    div[data-testid="stForm"] button {
-        background-color: #ffdd00 !important; /* AMARILLO */
-        color: #0f1c3f !important; /* AZUL OSCURO */
+    /* --- ARREGLO DEL ICONO DEL OJO (PASSWORD) --- */
+    /* Este hack fuerza al botón del ojo a ser pequeño y transparente */
+    [data-testid="stForm"] button[aria-label="Show password"],
+    [data-testid="stForm"] button[aria-label="Hide password"] {
+        font-size: 16px !important; /* Tamaño normal */
+        padding: 8px !important;    /* Menos espacio */
+        background: transparent !important; /* Sin fondo feo */
+        border: none !important;
+        color: #666 !important; /* Color gris discreto */
+        height: auto !important;
+        box-shadow: none !important;
+        margin-right: 5px;
+    }
+    /* -------------------------------------------- */
+
+    /* 5. BOTÓN INGRESAR VERDE (NUEVO COLOR) */
+    div[data-testid="stForm"] > .stButton > button {
+        background-color: #004d00 !important; /* VERDE CORPORATIVO */
+        color: white !important; /* TEXTO BLANCO */
         border: none !important;
         width: 100%;
         padding: 15px;
         font-weight: 700;
         font-size: 16px;
         border-radius: 6px;
-        margin-top: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 15px;
+        box-shadow: 0 4px 6px rgba(0, 77, 0, 0.2);
+        transition: all 0.2s;
     }
-    div[data-testid="stForm"] button:hover {
-        background-color: #ffe64d !important;
+    div[data-testid="stForm"] > .stButton > button:hover {
+        background-color: #006600 !important; /* Verde más claro al pasar mouse */
         transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 77, 0, 0.3);
     }
 
     /* 6. Textos */
     h1 { color: #0f1c3f; font-weight: 800; }
+    h2 { color: #0f1c3f; }
     h3 { color: #444; font-weight: 400; }
-    p, span { color: #666; }
+    p, span, small { color: #666; }
     a { color: #004d00 !important; font-weight: bold; }
 
-    /* Ocultar menú de Streamlit */
+    /* 7. OCULTAR LA PERSONITA DEL FOOTER (NUEVO) */
+    footer, [data-testid="stFooter"] {
+        display: none !important;
+    }
+    /* Ocultar menú de hamburguesa y header */
     #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
     header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
@@ -154,19 +172,17 @@ def solicitar_prestamo(usuario, monto, motivo):
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 
 # ---------------------------------------------------------
-# PANTALLA DE LOGIN (ARREGLADA Y CENTRADA)
+# PANTALLA DE LOGIN
 # ---------------------------------------------------------
 if st.session_state.usuario is None:
     
-    # Usamos columnas centradas con mejor proporción (1 vs 1)
     col1, col2 = st.columns([1, 1], gap="large")
 
     # --- IZQUIERDA: INFORMACIÓN Y LOGO ---
     with col1:
-        st.write("") # Espaciador
-        
-        # LOGO
+        st.write("") 
         try:
+            # Asegúrate que el nombre del archivo sea EXACTO al de GitHub
             st.image("logo.png", width=200)
         except:
             st.header("🌱 Family Bicons")
@@ -177,27 +193,22 @@ if st.session_state.usuario is None:
         
         <div style="background-color: white; padding: 20px; border-radius: 10px; border-left: 5px solid #004d00; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 20px; margin-right: 10px;">✅</span>
+                <span style="font-size: 20px; margin-right: 10px; color: #004d00;">✅</span>
                 <span style="font-size: 15px; font-weight: 500;">Sitio Verificado: Tus datos viajan encriptados.</span>
             </div>
             <div style="display: flex; align-items: center;">
-                <span style="font-size: 20px; margin-right: 10px;">🚫</span>
+                <span style="font-size: 20px; margin-right: 10px; color: #c53030;">🚫</span>
                 <span style="font-size: 15px; font-weight: 500;">Nunca compartas tu contraseña con terceros.</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # --- DERECHA: FORMULARIO (AHORA ES LA TARJETA) ---
+    # --- DERECHA: TARJETA DE LOGIN ---
     with col2:
-        # Aquí eliminé el div vacio. El formulario ES la tarjeta.
-        
-        st.markdown("<br>", unsafe_allow_html=True) # Un poco de aire arriba para alinear con el logo
-        
-        # Título DENTRO de la columna, fuera del form para que se vea limpio
-        st.markdown("<h2 style='text-align: center; color: #0f1c3f; margin-bottom: 5px;'>Bienvenido</h2>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; margin-bottom: 5px;'>Bienvenido</h2>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; font-size: 14px; margin-bottom: 20px;'>Ingresa tus credenciales</p>", unsafe_allow_html=True)
 
-        # El formulario tiene el estilo [data-testid="stForm"] que definimos en CSS
         with st.form("frm_login"):
             st.markdown("##### Usuario")
             u = st.text_input("Usuario", placeholder="Ej: JuanPerez", label_visibility="collapsed")
@@ -206,12 +217,12 @@ if st.session_state.usuario is None:
             p = st.text_input("Contraseña", type="password", placeholder="••••••••", label_visibility="collapsed")
             
             st.markdown("""
-            <div style="text-align: right; margin-bottom: 15px;">
-                <a href="#" style="font-size: 12px; text-decoration: none; color: #666;">¿Olvidaste tu usuario?</a>
+            <div style="text-align: right; margin-top: 5px; margin-bottom: 5px;">
+                <a href="#" style="font-size: 12px; text-decoration: none; color: #004d00;">¿Olvidaste tu usuario?</a>
             </div>
             """, unsafe_allow_html=True)
             
-            # ESTE BOTÓN AHORA SERÁ AMARILLO GRACIAS AL CSS
+            # EL BOTÓN AHORA ES VERDE
             btn = st.form_submit_button("INGRESAR")
             
             if btn:
@@ -224,8 +235,11 @@ if st.session_state.usuario is None:
         # Footer fuera de la tarjeta
         st.markdown("""
         <div style="margin-top: 20px; display: flex; justify-content: space-between; padding: 0 10px;">
-             <div style="cursor: pointer; opacity: 0.7;">🔒 <small>¿Bloqueada?</small></div>
-             <div style="cursor: pointer; opacity: 0.7;">👤 <small>Regístrate</small></div>
+             <div style="cursor: pointer; opacity: 0.8; color: #004d00;"><small>🔒 ¿Bloqueada?</small></div>
+             <div style="cursor: pointer; opacity: 0.8; color: #004d00;"><small>👤 Regístrate</small></div>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+             <small style="font-size: 11px; color: #999;">© 2026 Family Bicons. Todos los derechos reservados.</small>
         </div>
         """, unsafe_allow_html=True)
 
@@ -296,14 +310,13 @@ else:
         st.write("")
         st.markdown("##### 📝 Nueva Solicitud")
         
-        # Tarjeta para solicitud
         st.markdown('<div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">', unsafe_allow_html=True)
         with st.form("frm_solicitud"):
             monto_req = st.number_input("Monto a solicitar ($)", min_value=10.0, step=5.0)
             motivo_req = st.text_area("Motivo", placeholder="Ej: Compra de mercadería...")
             
-            # CSS Específico para este botón verde
-            st.markdown("""<style>div[data-testid="stForm"] button {background-color: #004d00 !important; color: white !important;}</style>""", unsafe_allow_html=True)
+            # Botón verde para este formulario también
+            st.markdown("""<style>div[data-testid="stForm"] > .stButton > button {background-color: #004d00 !important; color: white !important;}</style>""", unsafe_allow_html=True)
             
             if st.form_submit_button("ENVIAR SOLICITUD"):
                 if solicitar_prestamo(user, monto_req, motivo_req):
