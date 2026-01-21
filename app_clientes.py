@@ -17,66 +17,77 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (TEMA CLARO + VERDE)
+# 🎨 ESTILOS CSS (MEJORADOS PARA APLICAR COLOR AL BOTÓN)
 # ==========================================
 st.markdown("""
     <style>
     /* 1. Fondo Claro y Limpio */
     .stApp {
-        background-color: #f4f6f9; /* Gris muy suave */
+        background-color: #f8f9fa; /* Gris muy suave, más moderno */
         color: #1f2937; /* Letra oscura */
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Tipografía más limpia */
     }
     
-    /* 2. Botón Principal VERDE */
-    .stButton>button { 
+    /* 2. Botón Principal VERDE (Selector más específico para que funcione) */
+    div.stButton > button:first-child {
         width: 100%; 
         border-radius: 8px; 
-        background-color: #004d00; /* TU VERDE */
-        color: white; 
+        background-color: #004d00 !important; /* TU VERDE, con !important */
+        color: white !important;
         border: none; 
-        font-weight: bold; 
-        padding: 12px;
+        font-weight: 600; /* Semibold */
+        padding: 12px 24px; /* Más padding */
         font-size: 16px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        transition: all 0.2s ease-in-out;
     }
-    .stButton>button:hover { 
-        background-color: #006600; /* Verde un poco más claro al pasar el mouse */
-        transform: translateY(-2px);
-        color: white;
+    div.stButton > button:first-child:hover {
+        background-color: #006600 !important; /* Verde más claro al pasar mouse */
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+    div.stButton > button:first-child:active {
+        transform: translateY(0px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     /* 3. Tarjetas Blancas con Borde Verde */
     .card { 
         background-color: white; 
-        padding: 20px; 
+        padding: 25px; /* Más espacio interno */
         border-radius: 12px; 
         border-left: 6px solid #004d00; /* Borde Verde */
-        margin-bottom: 15px; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Sombra más suave */
         color: #333;
     }
     
     .card-debt { 
         background-color: white; 
-        padding: 20px; 
+        padding: 25px;
         border-radius: 12px; 
         border-left: 6px solid #c53030; /* Borde Rojo */
-        margin-bottom: 15px; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         color: #333;
     }
     
     /* 4. Textos y Títulos */
-    .big-money { font-size: 28px; font-weight: 800; color: #004d00; font-family: 'Arial', sans-serif; }
-    h1, h2, h3 { color: #004d00 !important; }
-    p { color: #4b5563; }
+    .big-money { font-size: 32px; font-weight: 700; color: #004d00; }
+    h1, h2, h3 { color: #004d00 !important; font-weight: 700; }
+    p { color: #4b5563; line-height: 1.6; }
 
     /* Inputs (Cajas de texto) limpias */
-    .stTextInput>div>div>input {
+    .stTextInput > div > div > input {
         background-color: white;
         color: #333;
         border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .stTextInput > div > div > input:focus {
+        border-color: #004d00; /* Borde verde al escribir */
+        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
     }
     
     /* Ocultar menú de Streamlit */
@@ -145,30 +156,29 @@ def solicitar_prestamo(usuario, monto, motivo):
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 
 # ==========================================
-# 🔐 PANTALLA DE LOGIN (CLARO + FUNCIONALIDAD)
+# 🔐 PANTALLA DE LOGIN (DISEÑO PROFESIONAL)
 # ==========================================
 if st.session_state.usuario is None:
-    col_espacio1, col_centro, col_espacio2 = st.columns([1, 1, 1])
+    col_espacio1, col_centro, col_espacio2 = st.columns([1, 1.5, 1]) # Columna central más ancha
 
     with col_centro:
         st.write("") 
         st.write("") 
         
         with st.container():
-            # LOGO
+            # LOGO (Asegúrate de tener "logo.jpeg" en GitHub)
             try:
-                st.image("logo.jpeg", use_container_width=True)
+                # Muestra la imagen centrada y con un ancho controlado
+                st.image("logo.jpeg", width=150, use_container_width=False)
             except:
                 st.header("🌱 Family Bicons")
 
             st.markdown("""
-            <div style="text-align: center;">
-                <h1 style="color:#004d00; margin-bottom:0;">Banca Web</h1>
-                <p style="color:#6b7280; font-size:14px;">Bienvenido Socio</p>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color:#004d00; margin-bottom:5px; font-size: 28px;">Banca Web</h2>
+                <p style="color:#6b7280; font-size:16px;">Bienvenido Socio</p>
             </div>
             """, unsafe_allow_html=True)
-            
-            st.write("") 
             
             # FORMULARIO LOGIN
             with st.form("frm_login"):
@@ -176,6 +186,7 @@ if st.session_state.usuario is None:
                 p = st.text_input("Contraseña", type="password", placeholder="••••••••")
                 
                 st.write("")
+                # Botón ahora sí verde
                 btn = st.form_submit_button("INGRESAR")
                 
                 if btn:
@@ -200,8 +211,8 @@ if st.session_state.usuario is None:
                         st.warning("Por favor escribe tu usuario.")
 
             st.markdown("""
-            <div style="text-align: center; margin-top: 15px;">
-                <span style="color:#9ca3af; font-size:12px;">🔒 Conexión Segura SSL</span>
+            <div style="text-align: center; margin-top: 30px;">
+                <span style="color:#9ca3af; font-size:13px;">🔒 Conexión Segura SSL | © 2026 Family Bicons</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -229,10 +240,10 @@ else:
                 
                 st.markdown(f"""
                 <div class="card">
-                    <div style="color:#666; font-size:14px; text-transform:uppercase;">Capital Acumulado</div>
+                    <div style="color:#666; font-size:14px; text-transform:uppercase; letter-spacing: 1px; font-weight: 600;">Capital Acumulado</div>
                     <div class="big-money">${dinero_total:,.2f}</div>
-                    <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px; font-size:13px; color:#555;">
-                        <b>{int(total_acciones)}</b> acciones activas
+                    <div style="margin-top:15px; border-top:1px solid #eee; padding-top:15px; font-size:14px; color:#555;">
+                        Tienes <b>{int(total_acciones)}</b> acciones activas
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -258,12 +269,12 @@ else:
                 st.markdown(f"""
                 <div class="card-debt">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:bold; color:#333;">PRÉSTAMO ({row['mes']})</span>
-                        <span style="background:#ffebee; color:#c53030; padding:4px 10px; border-radius:15px; font-size:11px; font-weight:bold;">POR PAGAR</span>
+                        <span style="font-weight:bold; color:#333; font-size: 16px;">PRÉSTAMO ({row['mes']})</span>
+                        <span style="background:#ffebee; color:#c53030; padding:4px 12px; border-radius:15px; font-size:12px; font-weight:bold;">POR PAGAR</span>
                     </div>
-                    <div style="margin-top:15px; font-size:13px; color:#666;">Cuota mensual:</div>
-                    <div style="font-size:22px; font-weight:bold; color:#c53030;">${cuota:,.2f}</div>
-                    <div style="margin-top:5px; font-size:12px; color:#888;">
+                    <div style="margin-top:15px; font-size:14px; color:#666;">Cuota mensual:</div>
+                    <div style="font-size:24px; font-weight:bold; color:#c53030;">${cuota:,.2f}</div>
+                    <div style="margin-top:8px; font-size:13px; color:#888;">
                         Total restante: ${monto_total:,.2f} (Plazo: {plazo} meses)
                     </div>
                 </div>
@@ -275,6 +286,7 @@ else:
     with tab3:
         st.write("")
         st.markdown("##### 📝 Nueva Solicitud")
+        st.info("Completa los datos para solicitar un nuevo crédito.")
         
         with st.form("frm_solicitud"):
             monto_req = st.number_input("Monto a solicitar ($)", min_value=10.0, step=5.0)
@@ -294,6 +306,7 @@ else:
         st.markdown("##### 👤 Mi Seguridad")
         
         with st.expander("🔐 Cambiar Contraseña"):
+            st.write("Ingresa tu nueva contraseña dos veces para confirmar.")
             p1 = st.text_input("Nueva contraseña", type="password", key="p1")
             p2 = st.text_input("Confirmar contraseña", type="password", key="p2")
             if st.button("Actualizar Clave"):
