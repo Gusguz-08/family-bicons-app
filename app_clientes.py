@@ -239,7 +239,7 @@ if st.session_state.usuario is None:
                 </p>
                 <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
                     <small style="font-weight:bold; color:#333;">📞 Contacto Soporte:</small><br>
-                    <span style="color:#004d00;">+593 99 999 9999</span>
+                    <span style="color:#004d00;">+593 96 734-2110</span>
                 </div>
                 <p style="font-size:12px; color:#888;">Envía tu número de cédula y usuario para validar tu identidad.</p>
             </div>
@@ -333,4 +333,5 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
+
 
