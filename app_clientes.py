@@ -169,7 +169,7 @@ if st.session_state.usuario is None:
             # LOGO (Asegúrate de tener "logo.jpeg" en GitHub)
             try:
                 # Muestra la imagen centrada y con un ancho controlado
-                st.image("logo.jpeg", width=150, use_container_width=False)
+                st.image("logo.png", width=150, use_container_width=False)
             except:
                 st.header("🌱 Family Bicons")
 
@@ -322,3 +322,4 @@ else:
         if st.button("Cerrar Sesión", type="secondary"):
             st.session_state.usuario = None
             st.rerun()
+
