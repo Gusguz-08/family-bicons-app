@@ -17,79 +17,78 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (MEJORADOS PARA APLICAR COLOR AL BOTÓN)
+# 🎨 ESTILOS CSS (MEJORADOS: DISEÑO TIPO PICHINCHA)
 # ==========================================
 st.markdown("""
     <style>
-    /* 1. Fondo Claro y Limpio */
+    /* 1. Fondo General */
     .stApp {
-        background-color: #f8f9fa; /* Gris muy suave, más moderno */
-        color: #1f2937; /* Letra oscura */
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Tipografía más limpia */
+        background-color: #f4f6f9; /* Gris muy suave para el fondo */
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* 2. Botón Principal VERDE (Selector más específico para que funcione) */
+    /* 2. Contenedor de la Tarjeta de Login */
+    .login-card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    
+    /* 3. Tarjeta de Login Blanca y con Sombra */
+    .login-card {
+        background-color: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* Sombra suave y moderna */
+        width: 100%;
+        max-width: 450px; /* Ancho máximo para que no se estire demasiado */
+    }
+
+    /* 4. Título Principal dentro de la Tarjeta */
+    .login-title {
+        color: #0f1c3f; /* Azul oscuro elegante */
+        font-weight: 700;
+        font-size: 28px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    /* 5. Botón INGRESAR (AMARILLO PICHINCHA) */
     div.stButton > button:first-child {
         width: 100%; 
         border-radius: 8px; 
-        background-color: #004d00 !important; /* TU VERDE, con !important */
-        color: white !important;
+        background-color: #ffdd00 !important; /* Amarillo intenso */
+        color: #0f1c3f !important; /* Texto azul oscuro */
         border: none; 
-        font-weight: 600; /* Semibold */
-        padding: 12px 24px; /* Más padding */
-        font-size: 16px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-weight: 700; /* Negrita */
+        padding: 14px;
+        font-size: 18px;
+        box-shadow: 0 4px 6px rgba(255, 221, 0, 0.3);
         transition: all 0.2s ease-in-out;
+        margin-top: 20px;
     }
     div.stButton > button:first-child:hover {
-        background-color: #006600 !important; /* Verde más claro al pasar mouse */
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-    }
-    div.stButton > button:first-child:active {
-        transform: translateY(0px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #ffe64d !important; /* Amarillo más claro al pasar mouse */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 221, 0, 0.4);
     }
 
-    /* 3. Tarjetas Blancas con Borde Verde */
-    .card { 
-        background-color: white; 
-        padding: 25px; /* Más espacio interno */
-        border-radius: 12px; 
-        border-left: 6px solid #004d00; /* Borde Verde */
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Sombra más suave */
-        color: #333;
-    }
-    
-    .card-debt { 
-        background-color: white; 
-        padding: 25px;
-        border-radius: 12px; 
-        border-left: 6px solid #c53030; /* Borde Rojo */
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        color: #333;
-    }
-    
-    /* 4. Textos y Títulos */
-    .big-money { font-size: 32px; font-weight: 700; color: #004d00; }
-    h1, h2, h3 { color: #004d00 !important; font-weight: 700; }
-    p { color: #4b5563; line-height: 1.6; }
-
-    /* Inputs (Cajas de texto) limpias */
+    /* 6. Estilos para los Inputs */
     .stTextInput > div > div > input {
-        background-color: white;
-        color: #333;
         border: 1px solid #d1d5db;
         border-radius: 8px;
-        padding: 10px 12px;
+        padding: 12px;
+        background-color: #f9fafb;
+        color: #333;
+        font-size: 16px;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #004d00; /* Borde verde al escribir */
-        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
+        border-color: #ffdd00; /* Borde amarillo al escribir */
+        box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.2);
+        background-color: white;
     }
-    
+
     /* Ocultar menú de Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -159,34 +158,52 @@ if 'usuario' not in st.session_state: st.session_state.usuario = None
 # 🔐 PANTALLA DE LOGIN (DISEÑO PROFESIONAL)
 # ==========================================
 if st.session_state.usuario is None:
-    col_espacio1, col_centro, col_espacio2 = st.columns([1, 1.5, 1]) # Columna central más ancha
+    # Layout de dos columnas: Izquierda (Visual/Info) | Derecha (Tarjeta Login)
+    col_izquierda, col_derecha = st.columns([1, 1], gap="large")
 
-    with col_centro:
-        st.write("") 
-        st.write("") 
+    # --- COLUMNA IZQUIERDA (Información y Logo) ---
+    with col_izquierda:
+        st.write("") # Espacio superior
+        st.write("")
         
         with st.container():
-            # LOGO (Asegúrate de tener "logo.jpeg" en GitHub)
+            # Muestra tu logo en grande
             try:
-                # Muestra la imagen centrada y con un ancho controlado
-                st.image("logo.png", width=150, use_container_width=False)
+                st.image("logo.png", use_container_width=True)
             except:
                 st.header("🌱 Family Bicons")
-
+            
             st.markdown("""
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color:#004d00; margin-bottom:5px; font-size: 28px;">Banca Web</h2>
-                <p style="color:#6b7280; font-size:16px;">Bienvenido Socio</p>
+            <div style="margin-top: 40px; color: #0f1c3f;">
+                <h1 style="font-weight: 800; font-size: 3.5rem; margin-bottom: 10px;">Bienvenido a tu Banca Web</h1>
+                <p style="font-size: 1.2rem; color: #4b5563;">
+                    Gestiona tus inversiones y créditos de forma segura y sencilla.
+                </p>
+                <div style="margin-top: 30px;">
+                    <span style="font-size: 14px; color: #004d00;">✅ Acceso Seguro las 24h</span><br>
+                    <span style="font-size: 14px; color: #004d00;">✅ Consulta tus saldos al instante</span>
+                </div>
             </div>
             """, unsafe_allow_html=True)
+
+    # --- COLUMNA DERECHA (Tarjeta de Login Centrada) ---
+    with col_derecha:
+        # Usamos un contenedor para centrar la tarjeta verticalmente
+        with st.container():
+            st.markdown('<div class="login-card-container">', unsafe_allow_html=True)
             
-            # FORMULARIO LOGIN
+            # Inicio de la Tarjeta Blanca
+            st.markdown('<div class="login-card">', unsafe_allow_html=True)
+            
+            # Título de la tarjeta
+            st.markdown('<div class="login-title">Ingresa a tu Cuenta</div>', unsafe_allow_html=True)
+            
+            # FORMULARIO
             with st.form("frm_login"):
-                u = st.text_input("Usuario", placeholder="Ingresa tu usuario")
-                p = st.text_input("Contraseña", type="password", placeholder="••••••••")
+                u = st.text_input("Usuario", placeholder="Tu nombre de usuario")
+                p = st.text_input("Contraseña", type="password", placeholder="Tu contraseña")
                 
-                st.write("")
-                # Botón ahora sí verde
+                # El botón se estiliza con el CSS de arriba para ser AMARILLO
                 btn = st.form_submit_button("INGRESAR")
                 
                 if btn:
@@ -196,25 +213,18 @@ if st.session_state.usuario is None:
                     else:
                         st.error("Credenciales incorrectas")
 
-            st.write("")
-            
-            # --- FUNCIONALIDAD: OLVIDASTE CONTRASEÑA ---
-            with st.expander("¿Olvidaste tu contraseña?"):
-                st.info("Ingresa tu usuario y te contactaremos para restablecerla.")
-                email_recup = st.text_input("Tu Usuario o Cédula")
-                if st.button("Solicitar Recuperación"):
-                    if email_recup:
-                        with st.spinner("Enviando solicitud al administrador..."):
-                            time.sleep(1.5) # Simula tiempo de carga
-                        st.success(f"✅ Solicitud enviada. El administrador revisará tu cuenta ({email_recup}).")
-                    else:
-                        st.warning("Por favor escribe tu usuario.")
-
+            # Enlace de "Olvidaste tu contraseña"
             st.markdown("""
-            <div style="text-align: center; margin-top: 30px;">
-                <span style="color:#9ca3af; font-size:13px;">🔒 Conexión Segura SSL | © 2026 Family Bicons</span>
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="#" style="color:#004d00; text-decoration:none; font-size:14px; font-weight:600;">¿Olvidaste tu contraseña?</a>
+                <br><br>
+                <span style="color:#9ca3af; font-size:13px;">🔒 Conexión Segura SSL | Family Bicons © 2026</span>
             </div>
             """, unsafe_allow_html=True)
+            
+            # Fin de la Tarjeta Blanca
+            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
 # 🏦 DENTRO DE LA APP (DASHBOARD)
@@ -322,4 +332,3 @@ else:
         if st.button("Cerrar Sesión", type="secondary"):
             st.session_state.usuario = None
             st.rerun()
-
