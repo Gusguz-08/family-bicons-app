@@ -17,86 +17,82 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (REPLICANDO ESTILO BANCARIO PREMIUM)
+# 🎨 ESTILOS CSS (CORRIGIENDO EL CUADRO VACÍO)
 # ==========================================
 st.markdown("""
     <style>
-    /* 1. Fondo General (Gris muy suave y limpio) */
+    /* 1. Fondo General y Centrado */
     .stApp {
-        background-color: #f4f7f6;
+        background-color: #f0f2f5; /* Gris muy suave */
         font-family: 'Segoe UI', sans-serif;
     }
-
-    /* 2. TRUCO PARA TU LOGO: Lo recorta en circulo para ocultar el fondo de cuadros */
-    /* Esto busca la imagen en la columna izquierda y le aplica el estilo */
-    [data-testid="stImage"] img {
-        border-radius: 50%;
-        border: 4px solid white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        object-fit: cover;
-        background-color: white; /* Por si la imagen tiene transparencia real */
+    
+    /* Esto centra el contenido verticalmente para que no se vea vacío */
+    [data-testid="stAppViewContainer"] > .main {
+        justify-content: center;
+        padding-top: 5vh; 
     }
 
-    /* 3. Contenedor de la Tarjeta de Login (Derecha) */
-    .login-box {
+    /* 2. LOGO REDONDO (Mantiene tu logo limpio) */
+    [data-testid="stImage"] img {
+        border-radius: 50%;
+        border: 5px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+    /* 3. LA TARJETA MÁGICA (Estilizamos el FORMULARIO directamente) */
+    /* Eliminamos el cuadro vacío estilizandolo directo al contenedor del form */
+    [data-testid="stForm"] {
         background-color: white;
         padding: 40px;
         border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Sombra suave y difusa */
-        border: 1px solid #eef2f6;
-        text-align: center;
-        margin-top: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08); /* Sombra elegante */
+        border: 1px solid #e1e4e8;
     }
 
-    /* 4. Inputs (Cajas de texto) más elegantes */
+    /* 4. Inputs (Cajas de texto) */
     .stTextInput input {
-        border: 1px solid #dfe1e5;
+        border: 1px solid #ccc;
         border-radius: 6px;
-        padding: 12px;
+        padding: 10px;
+        background-color: #fff;
         color: #333;
-        font-size: 16px;
-        background-color: #fafafa;
     }
     .stTextInput input:focus {
         border-color: #ffdd00;
-        background-color: white;
-        box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.2);
+        box-shadow: 0 0 0 2px rgba(255, 221, 0, 0.3);
     }
 
-    /* 5. Botón INGRESAR (AMARILLO PICHINCHA EXACTO) */
-    div.stButton > button {
+    /* 5. EL BOTÓN AMARILLO (FORZADO CON ALTA PRIORIDAD) */
+    /* Usamos selectores especificos para asegurar que se ponga amarillo */
+    div[data-testid="stForm"] button {
+        background-color: #ffdd00 !important; /* AMARILLO */
+        color: #0f1c3f !important; /* AZUL OSCURO */
+        border: none !important;
         width: 100%;
-        background-color: #ffdd00 !important;
-        color: #0f1c3f !important; /* Azul oscuro corporativo */
-        border: none;
-        border-radius: 6px;
+        padding: 15px;
         font-weight: 700;
-        padding: 14px;
         font-size: 16px;
-        margin-top: 15px;
-        transition: all 0.3s;
-        box-shadow: 0 4px 6px rgba(255, 221, 0, 0.2);
+        border-radius: 6px;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    div.stButton > button:hover {
+    div[data-testid="stForm"] button:hover {
         background-color: #ffe64d !important;
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(255, 221, 0, 0.3);
     }
 
-    /* 6. Textos y Títulos */
-    h1, h2, h3, h4 { color: #0f1c3f !important; font-family: 'Segoe UI', sans-serif; } 
-    p, small, span { color: #5f6368; }
-    a { color: #004d00 !important; }
+    /* 6. Textos */
+    h1 { color: #0f1c3f; font-weight: 800; }
+    h3 { color: #444; font-weight: 400; }
+    p, span { color: #666; }
+    a { color: #004d00 !important; font-weight: bold; }
 
-    /* Ocultar elementos extra de Streamlit */
+    /* Ocultar menú de Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    
-    /* Ajuste para móviles: que las columnas se apilen bien */
-    @media (max-width: 768px) {
-        .login-box { padding: 20px; }
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -158,59 +154,65 @@ def solicitar_prestamo(usuario, monto, motivo):
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 
 # ---------------------------------------------------------
-# PANTALLA DE LOGIN (ESTILO BANCO PICHINCHA)
+# PANTALLA DE LOGIN (ARREGLADA Y CENTRADA)
 # ---------------------------------------------------------
 if st.session_state.usuario is None:
     
-    st.write("") # Espacio superior
-    
-    # Columnas asimétricas: Izquierda (Info/Logo) más ancha visualmente, Derecha (Formulario) contenida
-    col1, col_space, col2 = st.columns([1.5, 0.2, 1.2])
+    # Usamos columnas centradas con mejor proporción (1 vs 1)
+    col1, col2 = st.columns([1, 1], gap="large")
 
     # --- IZQUIERDA: INFORMACIÓN Y LOGO ---
     with col1:
-        st.markdown("<br>", unsafe_allow_html=True) 
+        st.write("") # Espaciador
         
-        # LOGO (El CSS lo hará redondo automáticamente)
-        # Nota: Asegúrate que el nombre del archivo sea EXACTO al que tienes en GitHub
+        # LOGO
         try:
-            st.image("logo.png", width=220)
+            st.image("logo.png", width=200)
         except:
-            # Si falla la imagen, muestra un icono bonito
-            st.markdown("<div style='font-size: 80px;'>🌱</div>", unsafe_allow_html=True)
+            st.header("🌱 Family Bicons")
 
         st.markdown("""
-        <h1 style="font-size: 42px; font-weight: 800; margin-top: 10px; margin-bottom: 10px;">Family Bicons</h1>
-        <h3 style="color: #4b5563 !important; font-weight: 400; font-size: 24px;">Banca Web Segura</h3>
+        <h1 style="font-size: 48px; margin-top: 10px; margin-bottom: 0px;">Family Bicons</h1>
+        <h3 style="margin-top: 0px; margin-bottom: 30px;">Banca Web Segura</h3>
         
-        <div style="margin-top: 30px; border-left: 4px solid #004d00; padding-left: 20px;">
-            <p style="font-size: 16px; margin-bottom: 5px;">✅ <b>Sitio Verificado:</b> Tus datos viajan encriptados.</p>
-            <p style="font-size: 16px;">🚫 Nunca compartas tu contraseña con terceros.</p>
+        <div style="background-color: white; padding: 20px; border-radius: 10px; border-left: 5px solid #004d00; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 20px; margin-right: 10px;">✅</span>
+                <span style="font-size: 15px; font-weight: 500;">Sitio Verificado: Tus datos viajan encriptados.</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 20px; margin-right: 10px;">🚫</span>
+                <span style="font-size: 15px; font-weight: 500;">Nunca compartas tu contraseña con terceros.</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # --- DERECHA: TARJETA DE LOGIN ---
+    # --- DERECHA: FORMULARIO (AHORA ES LA TARJETA) ---
     with col2:
-        # Abrimos el contenedor con estilo "login-box" (definido en CSS arriba)
-        st.markdown('<div class="login-box">', unsafe_allow_html=True)
+        # Aquí eliminé el div vacio. El formulario ES la tarjeta.
         
-        st.markdown("<h3 style='text-align: center; margin-bottom: 5px; font-weight: 700;'>Ingresa a tu cuenta</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 14px; margin-bottom: 25px;'>Bienvenido socio</p>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True) # Un poco de aire arriba para alinear con el logo
         
+        # Título DENTRO de la columna, fuera del form para que se vea limpio
+        st.markdown("<h2 style='text-align: center; color: #0f1c3f; margin-bottom: 5px;'>Bienvenido</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 14px; margin-bottom: 20px;'>Ingresa tus credenciales</p>", unsafe_allow_html=True)
+
+        # El formulario tiene el estilo [data-testid="stForm"] que definimos en CSS
         with st.form("frm_login"):
-            # Inputs con diseño limpio
-            u = st.text_input("Usuario", placeholder="Escribe tu usuario")
-            p = st.text_input("Contraseña", type="password", placeholder="••••••••")
+            st.markdown("##### Usuario")
+            u = st.text_input("Usuario", placeholder="Ej: JuanPerez", label_visibility="collapsed")
             
-            # Link de olvido contraseña
+            st.markdown("##### Contraseña")
+            p = st.text_input("Contraseña", type="password", placeholder="••••••••", label_visibility="collapsed")
+            
             st.markdown("""
-            <div style="text-align: right; margin-top: 5px; margin-bottom: 15px;">
-                <a href="#" style="font-size: 13px; text-decoration: none; font-weight: 600;">¿Olvidaste tu usuario?</a>
+            <div style="text-align: right; margin-bottom: 15px;">
+                <a href="#" style="font-size: 12px; text-decoration: none; color: #666;">¿Olvidaste tu usuario?</a>
             </div>
             """, unsafe_allow_html=True)
             
-            # Botón Amarillo
-            btn = st.form_submit_button("Ingresar")
+            # ESTE BOTÓN AHORA SERÁ AMARILLO GRACIAS AL CSS
+            btn = st.form_submit_button("INGRESAR")
             
             if btn:
                 if validar_login(u, p):
@@ -219,24 +221,13 @@ if st.session_state.usuario is None:
                 else:
                     st.error("Credenciales incorrectas")
 
-        # Footer de la tarjeta con opciones extra
+        # Footer fuera de la tarjeta
         st.markdown("""
-        <div style="margin-top: 25px; display: flex; justify-content: space-between; gap: 10px;">
-             <div style="background: #f9fafb; padding: 10px; width: 50%; border-radius: 6px; border: 1px solid #eee; cursor: pointer;">
-                <div style="font-size: 20px;">🔒</div>
-                <small style="font-weight: 600; display: block; margin-top: 5px;">¿Bloqueada?</small>
-             </div>
-             <div style="background: #f9fafb; padding: 10px; width: 50%; border-radius: 6px; border: 1px solid #eee; cursor: pointer;">
-                <div style="font-size: 20px;">👤</div>
-                <small style="font-weight: 600; display: block; margin-top: 5px;">Regístrate</small>
-             </div>
-        </div>
-        <div style="margin-top: 20px; font-size: 11px; color: #aaa;">
-            © 2026 Family Bicons. Todos los derechos reservados.
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; padding: 0 10px;">
+             <div style="cursor: pointer; opacity: 0.7;">🔒 <small>¿Bloqueada?</small></div>
+             <div style="cursor: pointer; opacity: 0.7;">👤 <small>Regístrate</small></div>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True) # Cierra login-box
 
 # ---------------------------------------------------------
 # DENTRO DE LA APP (DASHBOARD)
@@ -259,7 +250,6 @@ else:
                 total_acciones = sum(valores)
                 dinero_total = total_acciones * 5.0
                 
-                # Tarjeta de resumen limpia
                 st.markdown(f"""
                 <div style="background:white; padding:25px; border-radius:12px; border-left:6px solid #004d00; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
                     <div style="color:#666; font-size:13px; text-transform:uppercase; letter-spacing: 1px; font-weight: 600;">Capital Acumulado</div>
@@ -306,21 +296,14 @@ else:
         st.write("")
         st.markdown("##### 📝 Nueva Solicitud")
         
-        # Formulario estilo tarjeta
+        # Tarjeta para solicitud
         st.markdown('<div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">', unsafe_allow_html=True)
         with st.form("frm_solicitud"):
             monto_req = st.number_input("Monto a solicitar ($)", min_value=10.0, step=5.0)
             motivo_req = st.text_area("Motivo", placeholder="Ej: Compra de mercadería...")
             
-            # Botón verde para acciones dentro de la app
-            st.markdown("""
-                <style>
-                div[data-testid="stForm"] button {
-                    background-color: #004d00 !important;
-                    color: white !important;
-                }
-                </style>
-            """, unsafe_allow_html=True)
+            # CSS Específico para este botón verde
+            st.markdown("""<style>div[data-testid="stForm"] button {background-color: #004d00 !important; color: white !important;}</style>""", unsafe_allow_html=True)
             
             if st.form_submit_button("ENVIAR SOLICITUD"):
                 if solicitar_prestamo(user, monto_req, motivo_req):
