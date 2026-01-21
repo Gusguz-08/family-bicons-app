@@ -17,38 +17,32 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (MODO "APP CONGELADA")
+# 🎨 ESTILOS CSS (MODO APP ESTÁTICA)
 # ==========================================
 st.markdown("""
     <style>
-    /* 1. BLOQUEAR EL SCROLL (LA CLAVE) */
-    /* Esto congela la página para que no se mueva */
+    /* 1. CONGELAR PANTALLA (No scroll) */
     [data-testid="stAppViewContainer"] {
         overflow: hidden !important; 
         height: 100vh !important;
     }
-    
-    /* 2. Quitar espacios vacíos de Streamlit */
     .block-container {
-        padding-top: 2rem !important; /* Muy poco espacio arriba */
+        padding-top: 2rem !important; 
         padding-bottom: 0rem !important;
         max-width: 100% !important;
     }
     
-    /* Ocultar barra de herramientas y footer */
-    [data-testid="stToolbar"] { display: none !important; }
-    footer { display: none !important; }
-    #MainMenu { display: none !important; }
-    header { display: none !important; }
+    /* Ocultar barras extra */
+    [data-testid="stToolbar"], footer, #MainMenu, header { display: none !important; }
 
-    /* 3. Estilo General */
+    /* 2. ESTILO GENERAL */
     .stApp {
         background-color: #f2f4f8;
         font-family: 'Segoe UI', sans-serif;
         font-size: 14px;
     }
 
-    /* 4. LOGO REDONDO */
+    /* 3. LOGO */
     [data-testid="stImage"] img {
         border-radius: 50%;
         border: 4px solid white;
@@ -56,64 +50,66 @@ st.markdown("""
         background-color: white;
     }
 
-    /* 5. TARJETA COMPACTA */
-    [data-testid="stForm"] {
+    /* 4. TARJETA CENTRAL */
+    [data-testid="stForm"], .recovery-card {
         background-color: white;
-        padding: 25px !important;
+        padding: 30px !important;
         border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Sombra más fuerte para resaltar */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         border: 1px solid #e1e4e8;
         max-width: 400px;
         margin: 0 auto;
     }
 
-    /* 6. Inputs */
+    /* 5. INPUTS */
     .stTextInput input {
-        padding: 8px 10px;
+        padding: 10px;
         font-size: 14px;
         border: 1px solid #ccc;
-        border-radius: 5px;
+        border-radius: 6px;
     }
     .stTextInput input:focus {
         border-color: #004d00;
-        box-shadow: 0 0 0 1px rgba(0, 77, 0, 0.2);
+        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
     }
-    .stTextInput label {
-        font-size: 13px !important;
-        margin-bottom: 2px !important;
-    }
+    .stTextInput label { font-size: 13px !important; margin-bottom: 2px !important; }
 
-    /* 7. BOTÓN VERDE */
-    div.stButton > button {
+    /* 6. BOTONES (VERDES) */
+    .stButton button {
         background-color: #004d00 !important;
         color: white !important;
         border: none !important;
         width: 100%;
-        padding: 10px !important;
+        padding: 12px !important;
         font-weight: 700 !important;
         border-radius: 6px !important;
         margin-top: 10px !important;
     }
-    div.stButton > button:hover {
-        background-color: #006600 !important;
+    .stButton button:hover { background-color: #006600 !important; }
+
+    /* Botón secundario (Volver) */
+    .btn-secondary button {
+        background-color: #666 !important;
     }
     
-    /* 8. Arreglo del Ojo de contraseña */
-    button[aria-label="Show password"], button[aria-label="Hide password"] {
-        background-color: transparent !important;
-        border: none !important;
-        color: #555 !important;
+    /* 7. TEXTO LINK (Olvidaste contraseña) */
+    .link-btn button {
+        background: transparent !important;
+        color: #004d00 !important;
+        text-decoration: underline;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 12px !important;
+        width: auto !important;
+        height: auto !important;
     }
-    
-    /* Copyright fijo abajo */
+    .link-btn button:hover { color: #006600 !important; background: transparent !important; }
+
+    /* Footer fijo */
     .copyright-fixed {
-        position: fixed;
-        bottom: 10px;
-        width: 100%;
-        text-align: center;
-        font-size: 11px;
-        color: #aaa;
-        left: 0;
+        position: fixed; bottom: 10px; width: 100%; text-align: center;
+        font-size: 11px; color: #aaa; left: 0;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -123,10 +119,8 @@ st.markdown("""
 # ==========================================
 @st.cache_resource
 def get_connection():
-    try:
-        return psycopg2.connect(DB_URL)
-    except Exception:
-        return None
+    try: return psycopg2.connect(DB_URL)
+    except: return None
 
 # ==========================================
 # 🧠 LÓGICA
@@ -174,20 +168,21 @@ def solicitar_prestamo(usuario, monto, motivo):
 # ==========================================
 
 if 'usuario' not in st.session_state: st.session_state.usuario = None
+# Variable para saber si estamos viendo el login o la recuperación
+if 'vista_login' not in st.session_state: st.session_state.vista_login = 'login' 
 
 # ---------------------------------------------------------
-# LOGIN (ESTÁTICO)
+# PANTALLA DE INICIO (LOGIN / RECUPERACIÓN)
 # ---------------------------------------------------------
 if st.session_state.usuario is None:
     
-    # Creamos columnas para centrar todo
     col1, col2 = st.columns([1.1, 1], gap="medium")
 
+    # --- IZQUIERDA (INFO) ---
     with col1:
         st.write("") 
         try:
-            # Logo ajustado
-            st.image("logo.png", width=140)
+            st.image("WhatsApp Image 2026-01-20 at 20.45.54.jpeg", width=140)
         except:
             st.header("🌱 Family Bicons")
 
@@ -207,46 +202,65 @@ if st.session_state.usuario is None:
         </div>
         """, unsafe_allow_html=True)
 
+    # --- DERECHA (TARJETA DINÁMICA) ---
     with col2:
         st.write("") 
         
-        with st.form("frm_login"):
-            st.markdown("<h3 style='text-align: center; margin-bottom: 10px; color:#333; font-weight:600; font-size:20px;'>Bienvenido</h3>", unsafe_allow_html=True)
-            
-            u = st.text_input("Usuario", placeholder="Tu usuario")
-            p = st.text_input("Contraseña", type="password", placeholder="••••••••")
-            
-            st.write("")
-            
-            # BOTÓN VERDE
-            btn = st.form_submit_button("INGRESAR")
-            
-            if btn:
-                if validar_login(u, p):
-                    st.session_state.usuario = u
-                    st.rerun()
-                else:
-                    st.error("Datos incorrectos")
-        
-        # Enlace simple
-        if st.button("¿Olvidaste tu contraseña?", type="tertiary"):
-             st.warning("Contacta al administrador.")
+        # --- VISTA 1: FORMULARIO DE LOGIN ---
+        if st.session_state.vista_login == 'login':
+            with st.form("frm_login"):
+                st.markdown("<h3 style='text-align: center; margin-bottom: 10px; color:#333; font-weight:600; font-size:20px;'>Bienvenido</h3>", unsafe_allow_html=True)
+                
+                u = st.text_input("Usuario", placeholder="Tu usuario")
+                p = st.text_input("Contraseña", type="password", placeholder="••••••••")
+                
+                st.write("")
+                if st.form_submit_button("INGRESAR"):
+                    if validar_login(u, p):
+                        st.session_state.usuario = u
+                        st.rerun()
+                    else:
+                        st.error("Datos incorrectos")
 
-    # Copyright pegado al fondo (fuera del flujo normal)
+            # Botón "Olvidaste tu contraseña" fuera del form para manejar el estado
+            st.markdown("<div style='text-align: right; margin-top: 10px;' class='link-btn'>", unsafe_allow_html=True)
+            if st.button("¿Olvidaste tu contraseña?"):
+                st.session_state.vista_login = 'recuperar' # Cambiamos la vista
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # --- VISTA 2: RECUPERACIÓN DE CONTRASEÑA ---
+        elif st.session_state.vista_login == 'recuperar':
+            st.markdown("""
+            <div class="recovery-card">
+                <h3 style="color:#004d00; text-align:center;">Recuperar Acceso</h3>
+                <p style="font-size:13px; text-align:center; color:#666;">
+                    Por seguridad, el restablecimiento de contraseña debe ser realizado por un administrador.
+                </p>
+                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
+                    <small style="font-weight:bold; color:#333;">📞 Contacto Soporte:</small><br>
+                    <span style="color:#004d00;">+593 99 999 9999</span>
+                </div>
+                <p style="font-size:12px; color:#888;">Envía tu número de cédula y usuario para validar tu identidad.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Botón Volver con estilo secundario
+            st.markdown("<div class='btn-secondary'>", unsafe_allow_html=True)
+            if st.button("⬅ Volver al Login"):
+                st.session_state.vista_login = 'login' # Regresamos
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # Copyright fijo
     st.markdown('<div class="copyright-fixed">© 2026 Family Bicons. Todos los derechos reservados.</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# DASHBOARD (Aquí sí permitimos scroll si es necesario)
+# DASHBOARD (APP DENTRO)
 # ---------------------------------------------------------
 else:
-    # Desbloqueamos el scroll solo cuando ya entró, para que pueda ver sus deudas si son muchas
-    st.markdown("""
-        <style>
-        [data-testid="stAppViewContainer"] {
-            overflow: auto !important; 
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    # Habilitar scroll adentro
+    st.markdown("<style>[data-testid='stAppViewContainer'] { overflow: auto !important; }</style>", unsafe_allow_html=True)
 
     user = st.session_state.usuario
     inv, deu = obtener_datos_socio(user)
@@ -298,7 +312,6 @@ else:
         with st.form("frm_solicitud"):
             monto_req = st.number_input("Monto ($)", min_value=10.0, step=5.0)
             motivo_req = st.text_area("Motivo")
-            st.markdown("""<style>div[data-testid="stForm"] > .stButton > button {background-color: #004d00 !important; color: white !important;}</style>""", unsafe_allow_html=True)
             if st.form_submit_button("ENVIAR"):
                 if solicitar_prestamo(user, monto_req, motivo_req): st.success("Enviado.")
                 else: st.error("Error.")
@@ -320,4 +333,3 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
-
