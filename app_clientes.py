@@ -17,11 +17,11 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (MODO APP ESTÁTICA)
+# 🎨 ESTILOS CSS (MODO "FUERZA COLOR OSCURO")
 # ==========================================
 st.markdown("""
     <style>
-    /* 1. CONGELAR PANTALLA (No scroll) */
+    /* 1. CONGELAR PANTALLA */
     [data-testid="stAppViewContainer"] {
         overflow: hidden !important; 
         height: 100vh !important;
@@ -52,7 +52,7 @@ st.markdown("""
 
     /* 4. TARJETA CENTRAL */
     [data-testid="stForm"], .recovery-card {
-        background-color: white;
+        background-color: white !important; /* Fondo BLANCO obligatorio */
         padding: 30px !important;
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -61,18 +61,37 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* 5. INPUTS */
+    /* -----------------------------------------------------------
+       5. ARREGLO DE COLORES (Aquí está la solución a tu problema)
+       Forzamos a que todo el texto dentro de la tarjeta sea OSCURO
+    ----------------------------------------------------------- */
+    
+    /* Etiquetas (Usuario, Contraseña) */
+    .stTextInput label, .stTextInput p {
+        color: #004d00 !important; /* Verde Oscuro */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    
+    /* Texto que escribes dentro de las cajas */
     .stTextInput input {
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+        color: #000000 !important; /* NEGRO (Para que se vea) */
+        background-color: #ffffff !important; /* Fondo blanco */
+        border: 1px solid #ccc !important;
+        caret-color: #000000 !important; /* Cursor negro */
     }
-    .stTextInput input:focus {
-        border-color: #004d00;
-        box-shadow: 0 0 0 2px rgba(0, 77, 0, 0.2);
+    
+    /* Títulos dentro del formulario */
+    [data-testid="stForm"] h3, [data-testid="stForm"] h1, [data-testid="stForm"] h2 {
+        color: #004d00 !important; /* Verde Oscuro */
     }
-    .stTextInput label { font-size: 13px !important; margin-bottom: 2px !important; }
+    
+    /* Texto de bienvenida */
+    .welcome-text {
+        color: #333333 !important; /* Gris oscuro */
+    }
+
+    /* ----------------------------------------------------------- */
 
     /* 6. BOTONES (VERDES) */
     .stButton button {
@@ -86,30 +105,20 @@ st.markdown("""
         margin-top: 10px !important;
     }
     .stButton button:hover { background-color: #006600 !important; }
-
-    /* Botón secundario (Volver) */
-    .btn-secondary button {
-        background-color: #666 !important;
-    }
     
-    /* 7. TEXTO LINK (Olvidaste contraseña) */
+    /* Texto del enlace Olvidaste Contraseña */
     .link-btn button {
-        background: transparent !important;
-        color: #004d00 !important;
-        text-decoration: underline;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-size: 12px !important;
-        width: auto !important;
-        height: auto !important;
+        color: #004d00 !important; /* Verde Oscuro */
+        font-weight: bold !important;
     }
-    .link-btn button:hover { color: #006600 !important; background: transparent !important; }
+    .link-btn button:hover {
+        color: #006600 !important;
+    }
 
     /* Footer fijo */
     .copyright-fixed {
         position: fixed; bottom: 10px; width: 100%; text-align: center;
-        font-size: 11px; color: #aaa; left: 0;
+        font-size: 11px; color: #888 !important; left: 0;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -168,7 +177,6 @@ def solicitar_prestamo(usuario, monto, motivo):
 # ==========================================
 
 if 'usuario' not in st.session_state: st.session_state.usuario = None
-# Variable para saber si estamos viendo el login o la recuperación
 if 'vista_login' not in st.session_state: st.session_state.vista_login = 'login' 
 
 # ---------------------------------------------------------
@@ -209,7 +217,8 @@ if st.session_state.usuario is None:
         # --- VISTA 1: FORMULARIO DE LOGIN ---
         if st.session_state.vista_login == 'login':
             with st.form("frm_login"):
-                st.markdown("<h3 style='text-align: center; margin-bottom: 10px; color:#333; font-weight:600; font-size:20px;'>Bienvenido</h3>", unsafe_allow_html=True)
+                # Título "Bienvenido" en color oscuro
+                st.markdown("<h3 style='text-align: center; margin-bottom: 10px; color:#333 !important; font-weight:600; font-size:20px;'>Bienvenido</h3>", unsafe_allow_html=True)
                 
                 u = st.text_input("Usuario", placeholder="Tu usuario")
                 p = st.text_input("Contraseña", type="password", placeholder="••••••••")
@@ -222,10 +231,10 @@ if st.session_state.usuario is None:
                     else:
                         st.error("Datos incorrectos")
 
-            # Botón "Olvidaste tu contraseña" fuera del form para manejar el estado
+            # Botón "Olvidaste tu contraseña"
             st.markdown("<div style='text-align: right; margin-top: 10px;' class='link-btn'>", unsafe_allow_html=True)
             if st.button("¿Olvidaste tu contraseña?"):
-                st.session_state.vista_login = 'recuperar' # Cambiamos la vista
+                st.session_state.vista_login = 'recuperar' 
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -233,22 +242,20 @@ if st.session_state.usuario is None:
         elif st.session_state.vista_login == 'recuperar':
             st.markdown("""
             <div class="recovery-card">
-                <h3 style="color:#004d00; text-align:center;">Recuperar Acceso</h3>
-                <p style="font-size:13px; text-align:center; color:#666;">
-                    Por seguridad, el restablecimiento de contraseña debe ser realizado por un administrador.
+                <h3 style="color:#004d00 !important; text-align:center;">Recuperar Acceso</h3>
+                <p style="font-size:13px; text-align:center; color:#333 !important;">
+                    Por seguridad, contacta al administrador.
                 </p>
-                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
-                    <small style="font-weight:bold; color:#333;">📞 Contacto Soporte:</small><br>
-                    <span style="color:#004d00;">+593 96 734-2110</span>
+                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0; border: 1px solid #ddd;">
+                    <small style="font-weight:bold; color:#000 !important;">📞 Contacto Soporte:</small><br>
+                    <span style="color:#004d00; font-weight:bold;">+593 99 999 9999</span>
                 </div>
-                <p style="font-size:12px; color:#888;">Envía tu número de cédula y usuario para validar tu identidad.</p>
             </div>
             """, unsafe_allow_html=True)
             
-            # Botón Volver con estilo secundario
-            st.markdown("<div class='btn-secondary'>", unsafe_allow_html=True)
+            st.markdown("<div style='margin-top:10px;'>", unsafe_allow_html=True)
             if st.button("⬅ Volver al Login"):
-                st.session_state.vista_login = 'login' # Regresamos
+                st.session_state.vista_login = 'login'
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -259,7 +266,6 @@ if st.session_state.usuario is None:
 # DASHBOARD (APP DENTRO)
 # ---------------------------------------------------------
 else:
-    # Habilitar scroll adentro
     st.markdown("<style>[data-testid='stAppViewContainer'] { overflow: auto !important; }</style>", unsafe_allow_html=True)
 
     user = st.session_state.usuario
@@ -333,5 +339,3 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
-
-
