@@ -62,7 +62,7 @@ st.markdown("""
     }
 
     /* -----------------------------------------------------------
-       5. ARREGLO DE COLORES (Aquí está la solución a tu problema)
+       5. ARREGLO DE COLORES
        Forzamos a que todo el texto dentro de la tarjeta sea OSCURO
     ----------------------------------------------------------- */
     
@@ -239,7 +239,7 @@ if st.session_state.usuario is None:
             st.markdown("</div>", unsafe_allow_html=True)
 
         # --- VISTA 2: RECUPERACIÓN DE CONTRASEÑA ---
-            elif st.session_state.vista_login == 'recuperar':
+        elif st.session_state.vista_login == 'recuperar':
             st.markdown("""
             <div class="recovery-card">
                 <h3 style="color:#004d00; text-align:center;">Recuperar Acceso</h3>
@@ -341,4 +341,3 @@ else:
         if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
-
