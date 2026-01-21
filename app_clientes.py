@@ -1,6 +1,7 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
+import time
 from datetime import datetime
 
 # ==========================================
@@ -8,7 +9,7 @@ from datetime import datetime
 # ==========================================
 st.set_page_config(page_title="Family Bicons - Banca Web", page_icon="🌱", layout="wide")
 
-# 👇👇 TU ENLACE SEGURO (Manejo de errores si no hay secrets) 👇👇
+# 👇👇 TU ENLACE SEGURO 👇👇
 try:
     DB_URL = st.secrets["DB_URL"]
 except:
@@ -16,21 +17,22 @@ except:
     st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (AQUÍ ESTÁ LA MAGIA VISUAL)
+# 🎨 ESTILOS CSS (TEMA CLARO + VERDE)
 # ==========================================
 st.markdown("""
     <style>
-    /* Fondo general más limpio */
+    /* 1. Fondo Claro y Limpio */
     .stApp {
-        background-color: #f4f6f9;
+        background-color: #f4f6f9; /* Gris muy suave */
+        color: #1f2937; /* Letra oscura */
     }
     
-    /* Estilo del Botón INGRESAR (Parecido al del Banco) */
+    /* 2. Botón Principal VERDE */
     .stButton>button { 
         width: 100%; 
         border-radius: 8px; 
-        background-color: #ffdd00; /* Amarillo Pichincha (o usa #004d00 para tu verde) */
-        color: #0f1c3f; 
+        background-color: #004d00; /* TU VERDE */
+        color: white; 
         border: none; 
         font-weight: bold; 
         padding: 12px;
@@ -39,19 +41,45 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     .stButton>button:hover { 
-        background-color: #ffe64d; 
+        background-color: #006600; /* Verde un poco más claro al pasar el mouse */
         transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        color: white;
     }
 
-    /* Estilo de las Tarjetas de Datos (Dentro de la app) */
-    .card { background-color: white; padding: 20px; border-radius: 12px; border-left: 6px solid #004d00; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .card-debt { background-color: white; padding: 20px; border-radius: 12px; border-left: 6px solid #c53030; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    /* 3. Tarjetas Blancas con Borde Verde */
+    .card { 
+        background-color: white; 
+        padding: 20px; 
+        border-radius: 12px; 
+        border-left: 6px solid #004d00; /* Borde Verde */
+        margin-bottom: 15px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        color: #333;
+    }
     
-    /* Textos grandes */
+    .card-debt { 
+        background-color: white; 
+        padding: 20px; 
+        border-radius: 12px; 
+        border-left: 6px solid #c53030; /* Borde Rojo */
+        margin-bottom: 15px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        color: #333;
+    }
+    
+    /* 4. Textos y Títulos */
     .big-money { font-size: 28px; font-weight: 800; color: #004d00; font-family: 'Arial', sans-serif; }
+    h1, h2, h3 { color: #004d00 !important; }
+    p { color: #4b5563; }
+
+    /* Inputs (Cajas de texto) limpias */
+    .stTextInput>div>div>input {
+        background-color: white;
+        color: #333;
+        border: 1px solid #d1d5db;
+    }
     
-    /* Ocultar menú de hamburguesa y footer para que parezca app nativa */
+    /* Ocultar menú de Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -77,8 +105,7 @@ def validar_login(usuario, password):
     try:
         df = pd.read_sql("SELECT * FROM usuarios WHERE usuario = %s AND password = %s", conn, params=(usuario, password))
         return not df.empty
-    except:
-        return False
+    except: return False
 
 def obtener_datos_socio(usuario):
     conn = get_connection()
@@ -118,37 +145,37 @@ def solicitar_prestamo(usuario, monto, motivo):
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 
 # ==========================================
-# 🔐 PANTALLA DE LOGIN (CON TU LOGO)
+# 🔐 PANTALLA DE LOGIN (CLARO + FUNCIONALIDAD)
 # ==========================================
 if st.session_state.usuario is None:
-    # Usamos columnas para centrar el contenido como en la foto del banco
     col_espacio1, col_centro, col_espacio2 = st.columns([1, 1, 1])
 
     with col_centro:
-        st.write("") # Espacio arriba
+        st.write("") 
         st.write("") 
         
-        # CONTENEDOR VISUAL (LA TARJETA BLANCA)
         with st.container():
-            # 👇 AQUÍ ESTÁ TU LOGO 👇
-            # Asegúrate de que el archivo en GitHub se llame EXACTAMENTE "logo.jpeg"
-            st.image("logo.png", use_container_width=True)
+            # LOGO
+            try:
+                st.image("logo.jpeg", use_container_width=True)
+            except:
+                st.header("🌱 Family Bicons")
 
             st.markdown("""
             <div style="text-align: center;">
-                <h1 style="color:#0f1c3f; margin-bottom:0;">Banca Web</h1>
-                <p style="color:gray; font-size:14px;">Bienvenido a Family Bicons</p>
+                <h1 style="color:#004d00; margin-bottom:0;">Banca Web</h1>
+                <p style="color:#6b7280; font-size:14px;">Bienvenido Socio</p>
             </div>
             """, unsafe_allow_html=True)
             
-            st.write("") # Separador
+            st.write("") 
             
-            # FORMULARIO
+            # FORMULARIO LOGIN
             with st.form("frm_login"):
                 u = st.text_input("Usuario", placeholder="Ingresa tu usuario")
                 p = st.text_input("Contraseña", type="password", placeholder="••••••••")
                 
-                st.write("") # Espacio antes del botón
+                st.write("")
                 btn = st.form_submit_button("INGRESAR")
                 
                 if btn:
@@ -158,14 +185,26 @@ if st.session_state.usuario is None:
                     else:
                         st.error("Credenciales incorrectas")
 
-            # Links de ayuda visuales
+            st.write("")
+            
+            # --- FUNCIONALIDAD: OLVIDASTE CONTRASEÑA ---
+            with st.expander("¿Olvidaste tu contraseña?"):
+                st.info("Ingresa tu usuario y te contactaremos para restablecerla.")
+                email_recup = st.text_input("Tu Usuario o Cédula")
+                if st.button("Solicitar Recuperación"):
+                    if email_recup:
+                        with st.spinner("Enviando solicitud al administrador..."):
+                            time.sleep(1.5) # Simula tiempo de carga
+                        st.success(f"✅ Solicitud enviada. El administrador revisará tu cuenta ({email_recup}).")
+                    else:
+                        st.warning("Por favor escribe tu usuario.")
+
             st.markdown("""
             <div style="text-align: center; margin-top: 15px;">
-                <a href="#" style="color:#004d00; text-decoration:none; font-size:12px;">¿Olvidaste tu contraseña?</a>
-                <br>
-                <span style="color:gray; font-size:12px;">🔒 Conexión Segura</span>
+                <span style="color:#9ca3af; font-size:12px;">🔒 Conexión Segura SSL</span>
             </div>
             """, unsafe_allow_html=True)
+
 # ==========================================
 # 🏦 DENTRO DE LA APP (DASHBOARD)
 # ==========================================
@@ -173,7 +212,7 @@ else:
     user = st.session_state.usuario
     inv, deu = obtener_datos_socio(user)
     
-    # Header simple dentro de la app
+    # Header
     st.markdown(f"### Hola, **{user}** 👋")
     
     tab1, tab2, tab3, tab4 = st.tabs(["💎 ACCIONES", "📅 PAGOS", "💸 SOLICITAR", "⚙️ PERFIL"])
@@ -188,12 +227,11 @@ else:
                 total_acciones = sum(valores)
                 dinero_total = total_acciones * 5.0
                 
-                # Tarjeta limpia
                 st.markdown(f"""
                 <div class="card">
-                    <div style="color:#666; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Capital Acumulado</div>
+                    <div style="color:#666; font-size:14px; text-transform:uppercase;">Capital Acumulado</div>
                     <div class="big-money">${dinero_total:,.2f}</div>
-                    <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px; font-size:13px; color:#444;">
+                    <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px; font-size:13px; color:#555;">
                         <b>{int(total_acciones)}</b> acciones activas
                     </div>
                 </div>
@@ -201,7 +239,7 @@ else:
                 
                 st.caption("📈 Evolución de tu inversión")
                 df_chart = pd.DataFrame({"Mes": ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][:len(valores)], "Acciones": valores})
-                st.area_chart(df_chart.set_index("Mes"), color="#004d00")
+                st.area_chart(df_chart.set_index("Mes"), color="#004d00") # VERDE
             else:
                 st.warning("Datos incompletos.")
         else:
