@@ -13,92 +13,112 @@ st.set_page_config(page_title="Banca Web | Family Bicons", page_icon="🌱", lay
 try:
     DB_URL = st.secrets["DB_URL"]
 except:
-    # Para pruebas locales si no hay secretos
-    DB_URL = "" 
+    st.error("⚠️ Error crítico: No se configuró el secreto DB_URL.")
+    st.stop()
 
 # ==========================================
-# 🎨 ESTILOS CSS (EL ARREGLO VISUAL)
+# 🎨 ESTILOS CSS (MODO "FUERZA COLOR OSCURO")
 # ==========================================
 st.markdown("""
     <style>
-    /* 1. FORZAR MODO CLARO Y TEXTO OSCURO (SOLUCIÓN AL TEXTO INVISIBLE) */
-    .stApp {
-        background-color: #f2f4f8;
-        color: #0f1c3f !important; /* Texto Azul Oscuro SIEMPRE */
+    /* 1. CONGELAR PANTALLA */
+    [data-testid="stAppViewContainer"] {
+        overflow: hidden !important; 
+        height: 100vh !important;
     }
-    
-    /* Forzar color en títulos y textos de Streamlit */
-    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stTextInput > label, div[data-testid="stExpander"] p {
-        color: #0f1c3f !important;
-    }
-
-    /* 2. LIMPIEZA DE INTERFAZ */
-    [data-testid="stToolbar"], footer, #MainMenu, header { display: none !important; }
     .block-container {
         padding-top: 2rem !important; 
-        padding-bottom: 2rem !important;
-        max-width: 900px !important; /* Centrar el contenido */
+        padding-bottom: 0rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* Ocultar barras extra */
+    [data-testid="stToolbar"], footer, #MainMenu, header { display: none !important; }
+
+    /* 2. ESTILO GENERAL */
+    .stApp {
+        background-color: #f2f4f8;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px;
     }
 
-    /* 3. TARJETAS DEL DASHBOARD */
-    .card-dashboard {
+    /* 3. LOGO */
+    [data-testid="stImage"] img {
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         background-color: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        border: 1px solid #e1e4e8;
-        margin-bottom: 20px;
     }
 
-    /* 4. ESTILOS DE LOGIN */
+    /* 4. TARJETA CENTRAL */
     [data-testid="stForm"], .recovery-card {
-        background-color: white !important;
-        padding: 40px !important;
+        background-color: white !important; /* Fondo BLANCO obligatorio */
+        padding: 30px !important;
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         border: 1px solid #e1e4e8;
+        max-width: 400px;
+        margin: 0 auto;
     }
 
-    /* 5. INPUTS MEJORADOS (EL ARREGLO CLAVE) */
-    /* Esto asegura que el fondo sea blanco y la letra negra siempre */
-    .stTextInput input {
-        color: #000000 !important;
-        background-color: #ffffff !important;
-        border: 1px solid #ced4da !important;
+    /* -----------------------------------------------------------
+       5. ARREGLO DE COLORES
+       Forzamos a que todo el texto dentro de la tarjeta sea OSCURO
+    ----------------------------------------------------------- */
+    
+    /* Etiquetas (Usuario, Contraseña) */
+    .stTextInput label, .stTextInput p {
+        color: #004d00 !important; /* Verde Oscuro */
+        font-weight: 600 !important;
+        font-size: 14px !important;
     }
     
-    /* 6. BOTONES */
+    /* Texto que escribes dentro de las cajas */
+    .stTextInput input {
+        color: #000000 !important; /* NEGRO (Para que se vea) */
+        background-color: #ffffff !important; /* Fondo blanco */
+        border: 1px solid #ccc !important;
+        caret-color: #000000 !important; /* Cursor negro */
+    }
+    
+    /* Títulos dentro del formulario */
+    [data-testid="stForm"] h3, [data-testid="stForm"] h1, [data-testid="stForm"] h2 {
+        color: #004d00 !important; /* Verde Oscuro */
+    }
+    
+    /* Texto de bienvenida */
+    .welcome-text {
+        color: #333333 !important; /* Gris oscuro */
+    }
+
+    /* ----------------------------------------------------------- */
+
+    /* 6. BOTONES (VERDES) */
     .stButton button {
         background-color: #004d00 !important;
         color: white !important;
-        border-radius: 8px !important;
         border: none !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease;
         width: 100%;
+        padding: 12px !important;
+        font-weight: 700 !important;
+        border-radius: 6px !important;
+        margin-top: 10px !important;
     }
-    .stButton button:hover {
-        background-color: #006600 !important;
-        box-shadow: 0 4px 10px rgba(0,77,0,0.2);
+    .stButton button:hover { background-color: #006600 !important; }
+    
+    /* Texto del enlace Olvidaste Contraseña */
+    .link-btn button {
+        color: #004d00 !important; /* Verde Oscuro */
+        font-weight: bold !important;
+    }
+    .link-btn button:hover {
+        color: #006600 !important;
     }
 
-    /* Botón de salir (Rojo suave) */
-    .logout-btn button {
-        background-color: #fff !important;
-        color: #c53030 !important;
-        border: 1px solid #c53030 !important;
-    }
-    .logout-btn button:hover {
-        background-color: #c53030 !important;
-        color: white !important;
-    }
-    
-    /* Pestañas */
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background-color: transparent !important;
-        border-bottom: 3px solid #004d00 !important;
-        color: #004d00 !important;
-        font-weight: bold !important;
+    /* Footer fijo */
+    .copyright-fixed {
+        position: fixed; bottom: 10px; width: 100%; text-align: center;
+        font-size: 11px; color: #888 !important; left: 0;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -116,7 +136,7 @@ def get_connection():
 # ==========================================
 def validar_login(usuario, password):
     conn = get_connection()
-    if not conn: return True # Modo prueba si no hay DB
+    if not conn: return False
     try:
         df = pd.read_sql("SELECT * FROM usuarios WHERE usuario = %s AND password = %s", conn, params=(usuario, password))
         return not df.empty
@@ -160,39 +180,47 @@ if 'usuario' not in st.session_state: st.session_state.usuario = None
 if 'vista_login' not in st.session_state: st.session_state.vista_login = 'login' 
 
 # ---------------------------------------------------------
-# PANTALLA DE INICIO (LOGIN)
+# PANTALLA DE INICIO (LOGIN / RECUPERACIÓN)
 # ---------------------------------------------------------
 if st.session_state.usuario is None:
     
-    col1, col2 = st.columns([1, 1], gap="large")
+    col1, col2 = st.columns([1.1, 1], gap="medium")
 
-    # --- IZQUIERDA ---
+    # --- IZQUIERDA (INFO) ---
     with col1:
         st.write("") 
+        try:
+            st.image("logo.png", width=140)
+        except:
+            st.header("🌱 Family Bicons")
+
         st.markdown("""
-        <div style="padding-top: 40px;">
-            <h1 style="font-size: 42px; margin-bottom: 10px; color: #004d00 !important;">Family Bicons</h1>
-            <h3 style="color: #666 !important; font-weight: 400;">Tu banca segura y transparente.</h3>
-            <br>
-            <div style="background-color: white; padding: 20px; border-radius: 12px; border-left: 5px solid #004d00; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <p style="margin:0; font-size:15px; color:#444 !important;">
-                    <b>💡 Consejo de seguridad:</b><br>
-                    Nunca compartas tu contraseña con terceros. El equipo de soporte nunca te la pedirá.
-                </p>
+        <h1 style="font-size: 34px; margin-top: 5px; margin-bottom: 0px; color: #0f1c3f;">Family Bicons</h1>
+        <h3 style="margin-top: 0px; margin-bottom: 15px; font-size: 16px; color: #555;">Banca Web Segura</h3>
+        
+        <div style="background-color: white; padding: 12px; border-radius: 8px; border-left: 4px solid #004d00; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <span style="font-size: 14px; margin-right: 8px; color: #004d00;">✅</span>
+                <span style="font-size: 12px; color: #555;">Sitio Verificado.</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <span style="font-size: 14px; margin-right: 8px; color: #c53030;">🚫</span>
+                <span style="font-size: 12px; color: #555;">No compartas tu clave.</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # --- DERECHA (LOGIN) ---
+    # --- DERECHA (TARJETA DINÁMICA) ---
     with col2:
-        st.write("")
-        st.write("")
+        st.write("") 
+        
+        # --- VISTA 1: FORMULARIO DE LOGIN ---
         if st.session_state.vista_login == 'login':
             with st.form("frm_login"):
-                st.markdown("<h3 style='text-align: center; color:#0f1c3f !important;'>Iniciar Sesión</h3>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align: center; color:#888 !important; font-size: 13px;'>Ingresa tus credenciales para continuar</p>", unsafe_allow_html=True)
+                # Título "Bienvenido" en color oscuro
+                st.markdown("<h3 style='text-align: center; margin-bottom: 10px; color:#333 !important; font-weight:600; font-size:20px;'>Bienvenido</h3>", unsafe_allow_html=True)
                 
-                u = st.text_input("Usuario", placeholder="Ej: diegoballa")
+                u = st.text_input("Usuario", placeholder="Tu usuario")
                 p = st.text_input("Contraseña", type="password", placeholder="••••••••")
                 
                 st.write("")
@@ -201,190 +229,115 @@ if st.session_state.usuario is None:
                         st.session_state.usuario = u
                         st.rerun()
                     else:
-                        st.error("Credenciales incorrectas")
+                        st.error("Datos incorrectos")
 
-            # Botón secundario fuera del form
-            if st.button("¿Olvidaste tu contraseña?", type="secondary"):
-                st.session_state.vista_login = 'recuperar'
+            # Botón "Olvidaste tu contraseña"
+            st.markdown("<div style='text-align: right; margin-top: 10px;' class='link-btn'>", unsafe_allow_html=True)
+            if st.button("¿Olvidaste tu contraseña?"):
+                st.session_state.vista_login = 'recuperar' 
                 st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
+        # --- VISTA 2: RECUPERACIÓN DE CONTRASEÑA ---
         elif st.session_state.vista_login == 'recuperar':
             st.markdown("""
             <div class="recovery-card">
-                <h3 style="text-align:center;">Recuperar Acceso</h3>
-                <p style="text-align:center; color:#666;">Contacta al administrador para restablecer tu clave.</p>
-                <div style="background:#f0fdf4; padding:15px; border-radius:8px; text-align:center; margin: 15px 0;">
-                    <span style="color:#004d00; font-weight:bold; font-size: 18px;">📞 +593 96 734 2110</span>
+                <h3 style="color:#004d00; text-align:center;">Recuperar Acceso</h3>
+                <p style="font-size:13px; text-align:center; color:#666;">
+                    Por seguridad, el restablecimiento de contraseña debe ser realizado por un administrador.
+                </p>
+                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin:15px 0;">
+                    <small style="font-weight:bold; color:#333;">📞 Contacto Soporte:</small><br>
+                    <span style="color:#004d00;">+593 96 734 2110</span>
                 </div>
+                <p style="font-size:12px; color:#888;">Envía tu número de cédula y usuario para validar tu identidad.</p>
             </div>
             """, unsafe_allow_html=True)
-            if st.button("⬅ Volver"):
-                st.session_state.vista_login = 'login'
+            
+            # Botón Volver con estilo secundario
+            st.markdown("<div class='btn-secondary'>", unsafe_allow_html=True)
+            if st.button("⬅ Volver al Login"):
+                st.session_state.vista_login = 'login' # Regresamos
                 st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    # Footer
-    st.markdown('<div style="position: fixed; bottom: 20px; width: 100%; text-align: center; color: #aaa; font-size: 12px;">© 2026 Family Bicons System</div>', unsafe_allow_html=True)
+    # Copyright fijo
+    st.markdown('<div class="copyright-fixed">© 2026 Family Bicons. Todos los derechos reservados.</div>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# DASHBOARD (INTERIOR)
+# DASHBOARD (APP DENTRO)
 # ---------------------------------------------------------
 else:
+    st.markdown("<style>[data-testid='stAppViewContainer'] { overflow: auto !important; }</style>", unsafe_allow_html=True)
+
     user = st.session_state.usuario
     inv, deu = obtener_datos_socio(user)
     
-    # Header minimalista
-    st.markdown(f"""
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-        <div>
-            <h2 style="margin:0; color: #004d00 !important;">Hola, {user} 👋</h2>
-            <p style="margin:0; color: #666 !important;">Bienvenido a tu panel financiero</p>
-        </div>
-        <div style="background:white; padding:5px 15px; border-radius:20px; border:1px solid #ddd; font-size:12px; color:#555;">
-            🟢 Conectado
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"### Hola, **{user}** 👋")
     
-    # TABS
-    tab1, tab2, tab3, tab4 = st.tabs(["💎 Inversiones", "📅 Pagos Pendientes", "💸 Solicitar Crédito", "⚙️ Mi Perfil"])
+    tab1, tab2, tab3, tab4 = st.tabs(["💎 INVERSIONES", "📅 PAGOS", "💸 SOLICITAR", "⚙️ PERFIL"])
     
-    # --- TAB 1: INVERSIONES ---
     with tab1:
         st.write("")
-        # Usamos HTML para crear la tarjeta visual
         if not inv.empty:
             valores_texto = inv.iloc[0]['valores_meses']
-            valores = [float(x) for x in valores_texto.split(",")] if valores_texto else []
-            if valores:
+            if valores_texto:
+                valores = [float(x) for x in valores_texto.split(",")]
                 total_acciones = sum(valores)
                 dinero_total = total_acciones * 5.0
-                
                 st.markdown(f"""
-                <div class="card-dashboard">
-                    <div style="display:flex; align-items:center; margin-bottom:15px;">
-                        <div style="font-size:30px; margin-right:10px;">💰</div>
-                        <div>
-                            <div style="color:#666; font-size:13px; text-transform:uppercase; letter-spacing:1px;">Capital Total</div>
-                            <div style="font-size:32px; font-weight:800; color:#004d00;">${dinero_total:,.2f}</div>
-                        </div>
-                    </div>
-                    <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-                    <div style="display:flex; justify-content:space-between; color:#555; font-size:14px;">
-                        <span>Acciones Acumuladas:</span>
-                        <span style="font-weight:bold;">{int(total_acciones)} u.</span>
-                    </div>
+                <div style="background:white; padding:25px; border-radius:12px; border-left:6px solid #004d00; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="color:#666; font-size:13px;">CAPITAL ACUMULADO</div>
+                    <div style="font-size:36px; font-weight:800; color:#004d00;">${dinero_total:,.2f}</div>
+                    <div style="margin-top:10px; font-size:14px; color:#555;"><b>{int(total_acciones)}</b> acciones activas</div>
                 </div>
                 """, unsafe_allow_html=True)
-                
-                # Gráfico
-                st.markdown('<div class="card-dashboard"><h5>📈 Rendimiento</h5>', unsafe_allow_html=True)
                 df_chart = pd.DataFrame({"Mes": ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][:len(valores)], "Acciones": valores})
                 st.area_chart(df_chart.set_index("Mes"), color="#004d00")
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.info("Sin datos para graficar.")
-        else:
-            st.info("Aún no tienes inversiones registradas.")
+            else: st.warning("Sin datos.")
+        else: st.info("Sin inversiones.")
 
-    # --- TAB 2: PAGOS ---
     with tab2:
         st.write("")
         if not deu.empty:
+            st.markdown("##### ⚠️ Pendientes")
             for index, row in deu.iterrows():
-                monto = row['monto']
-                plazo = row['plazo'] if row['plazo'] > 0 else 1
-                cuota = monto / plazo
-                
+                monto_total = row['monto']
+                plazo = row['plazo']
+                cuota = monto_total / plazo if plazo > 0 else monto_total
                 st.markdown(f"""
-                <div class="card-dashboard" style="border-left: 5px solid #c53030;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h4 style="margin:0; color:#c53030 !important;">{row['mes']}</h4>
-                            <span style="font-size:12px; background:#ffebeb; color:#c53030; padding:2px 8px; border-radius:4px;">PENDIENTE</span>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:24px; font-weight:bold; color:#333;">${cuota:,.2f}</div>
-                            <small style="color:#888;">de ${monto:,.2f}</small>
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div class="card-dashboard" style="text-align:center; padding:40px;">
-                <h1 style="font-size:50px;">🎉</h1>
-                <h3 style="color:#004d00 !important;">¡Estás al día!</h3>
-                <p style="color:#666;">No tienes pagos pendientes por ahora.</p>
-            </div>
-            """, unsafe_allow_html=True)
+                <div style="background:white; padding:20px; border-radius:10px; border-left:5px solid #c53030; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between;"><b>{row['mes']}</b> <span style="color:#c53030; font-weight:bold;">PENDIENTE</span></div>
+                    <div style="font-size:26px; color:#c53030; font-weight:bold;">${cuota:,.2f}</div>
+                    <div style="color:#666; font-size:13px;">Total: ${monto_total:,.2f}</div>
+                </div>""", unsafe_allow_html=True)
+        else: st.success("✅ Al día")
 
-    # --- TAB 3: SOLICITAR ---
     with tab3:
         st.write("")
-        st.markdown('<div class="card-dashboard">', unsafe_allow_html=True)
-        st.markdown("#### 📝 Nueva Solicitud")
-        st.markdown("<p style='color:#666; font-size:14px; margin-bottom:20px;'>Completa los datos para solicitar un adelanto o préstamo.</p>", unsafe_allow_html=True)
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            monto_req = st.number_input("Monto a solicitar ($)", min_value=10.0, step=5.0, value=50.0)
-        with c2:
-            motivo_req = st.text_input("Motivo (Breve)", placeholder="Ej: Emergencia médica")
-            
-        st.write("")
-        if st.button("Enviar Solicitud"):
-            if solicitar_prestamo(user, monto_req, motivo_req):
-                st.success("Solicitud enviada correctamente.")
-            else:
-                st.error("Hubo un error al procesar la solicitud.")
+        st.markdown("##### 📝 Solicitar")
+        st.markdown('<div style="background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">', unsafe_allow_html=True)
+        with st.form("frm_solicitud"):
+            monto_req = st.number_input("Monto ($)", min_value=10.0, step=5.0)
+            motivo_req = st.text_area("Motivo")
+            if st.form_submit_button("ENVIAR"):
+                if solicitar_prestamo(user, monto_req, motivo_req): st.success("Enviado.")
+                else: st.error("Error.")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- TAB 4: PERFIL ---
     with tab4:
         st.write("")
-        # Tarjeta de Datos
-        st.markdown(f"""
-        <div class="card-dashboard">
-            <h4 style="margin-bottom:15px;">👤 Mis Datos</h4>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                <div>
-                    <label style="font-size:12px; color:#888;">Usuario</label>
-                    <div style="font-weight:bold; font-size:16px;">{user}</div>
-                </div>
-                <div>
-                    <label style="font-size:12px; color:#888;">Estado</label>
-                    <div style="color:#004d00; font-weight:bold;">Activo</div>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Tarjeta de Seguridad
-        st.markdown('<div class="card-dashboard">', unsafe_allow_html=True)
-        st.markdown('<h4 style="margin-bottom:15px;">🔐 Seguridad</h4>', unsafe_allow_html=True)
-        
-        with st.expander("Cambiar Contraseña"):
-            curr_pass = st.text_input("Contraseña Actual", type="password")
-            new_p1 = st.text_input("Nueva Contraseña", type="password")
-            new_p2 = st.text_input("Repetir Nueva Contraseña", type="password")
-            
-            if st.button("Actualizar Clave"):
-                if new_p1 == new_p2 and len(new_p1) > 0:
-                    if cambiar_password(user, new_p1):
-                        st.success("Contraseña actualizada. Inicia sesión de nuevo.")
-                        time.sleep(2)
+        with st.expander("🔐 Contraseña"):
+            p1 = st.text_input("Nueva", type="password", key="p1")
+            p2 = st.text_input("Confirmar", type="password", key="p2")
+            if st.button("Guardar"):
+                if p1 == p2 and len(p1)>0:
+                    if cambiar_password(user, p1):
+                        st.success("Listo.")
                         st.session_state.usuario = None
                         st.rerun()
-                    else:
-                        st.error("Error al actualizar.")
-                else:
-                    st.warning("Las contraseñas no coinciden.")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Botón Salir
-        st.write("")
-        st.markdown('<div class="logout-btn">', unsafe_allow_html=True)
-        if st.button("Cerrar Sesión"):
+                else: st.warning("Error.")
+        st.divider()
+        if st.button("Salir"):
             st.session_state.usuario = None
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
